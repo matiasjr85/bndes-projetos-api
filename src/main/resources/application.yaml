@@ -1,3 +1,14 @@
+server:
+  port: 8080
+
 spring:
-  application:
-    name: bndes-projetos-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bndes_projetos
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true

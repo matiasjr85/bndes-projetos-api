@@ -1,0 +1,57 @@
+# BNDES Projetos API (Backend)
+
+API REST em **Java (Spring Boot)** + **PostgreSQL** para gerenciar projetos, com fluxo de **Login/Cadastro** e funcionalidades de CRUD.
+
+## Objetivo
+Este projeto foi desenvolvido como um projeto pessoal/acadêmico para demonstrar:
+- Estruturação de solução (frontend separado do backend)
+- Autenticação (login/cadastro)
+- API REST com boas práticas
+- Persistência em banco relacional (PostgreSQL)
+- Paginação, ordenação e filtros
+
+## Tecnologias
+- Java 21
+- Spring Boot
+- Spring Web
+- Spring Security
+- Spring Data JPA
+- PostgreSQL
+- Maven
+
+## Escopo Funcional (Requisitos)
+- **RF01 — Cadastro de Projeto:** criar projeto com nome, descrição, valor, status e datas.
+- **RF02 — Listagem de Projetos:** listar com paginação e ordenação.
+- **RF03 — Filtro de Projetos:** filtrar por status e termo (nome/descrição).
+- **RF04 — Detalhamento:** visualizar dados completos por ID.
+- **RF05 — Atualização:** editar informações do projeto e atualizar status.
+- **RF06 — Exclusão:** remover projeto (lógica ou física, conforme implementação).
+
+## Fluxo do Sistema (alto nível)
+1. Ao iniciar a aplicação, o usuário é direcionado para a **tela de login** (frontend).
+2. Caso não possua conta, clica em **Registrar** e cria um usuário.
+3. Após cadastro, o sistema retorna para a **tela de login**.
+4. Somente com credenciais válidas o usuário acessa o **menu principal** (CRUD de projetos).
+5. O menu possui opção de **logout**.
+
+## Como executar (local)
+
+### 1) Pré-requisitos
+- Java 21 (ou Java 17)
+- Maven
+- Docker (recomendado para PostgreSQL)
+
+### 2) Subir o PostgreSQL com Docker
+Crie um arquivo `docker-compose.yml` na raiz do projeto com:
+
+```yml
+services:
+  postgres:
+    image: postgres:16
+    container_name: bndes_postgres
+    environment:
+      POSTGRES_DB: bndes
+      POSTGRES_USER: bndes
+      POSTGRES_PASSWORD: bndes
+    ports:
+      - "5432:5432"
