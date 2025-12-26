@@ -33,7 +33,6 @@ public class AuthController {
 
   @Operation(summary = "Logout (client-side) - just clear the token on frontend")
   @PostMapping("/logout")
-  public void logout() {
-    // JWT stateless: frontend just removes token.
+  public void logout() {    
   }
 }
