@@ -12,3 +12,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+app:
+  jwt:    
+    secret: "minha-chave-super-secreta-para-jwt-1234567890"
+    expirationMinutes: 120
+

@@ -1,4 +1,4 @@
-package br.com.edmilson.bndes.projetos.api;
+package br.com.edmilson.bndes.projects.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
