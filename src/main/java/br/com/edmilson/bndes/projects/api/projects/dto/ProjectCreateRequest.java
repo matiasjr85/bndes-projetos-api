@@ -11,7 +11,7 @@ public record ProjectCreateRequest(
     @NotBlank @Size(max = 120) String name,
     @NotBlank @Size(max = 2000) String description,
     @NotNull BigDecimal value,
-    @NotNull Boolean status,
+    @NotNull Boolean active,
     LocalDate startDate,
     LocalDate endDate
 ) {}

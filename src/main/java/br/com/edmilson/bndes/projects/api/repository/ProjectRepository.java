@@ -11,7 +11,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       SELECT p
       FROM Project p
       WHERE p.deletedAt IS NULL
-        AND (:status IS NULL OR p.status = :status)
+        AND (:active IS NULL OR p.active = :active)
         AND (
           :q IS NULL OR :q = '' OR
           LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
@@ -19,7 +19,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         )
       """)
   Page<Project> search(
-      @Param("status") Boolean status,
+      @Param("active") Boolean active,
       @Param("q") String q,
       Pageable pageable
   );

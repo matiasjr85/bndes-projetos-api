@@ -1,19 +1,17 @@
-server:
-  port: 8080
-
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bndes_projetos
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bndes_projetos}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
   jpa:
     hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-app:
-  jwt:    
-    secret: "minha-chave-super-secreta-para-jwt-1234567890"
-    expirationMinutes: 120
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
 
+  flyway:
+    baseline-on-migrate: true
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:minha-chave-super-secreta-para-jwt-1234567890}
+    expirationMinutes: ${APP_JWT_EXPIRATIONMINUTES:120}

@@ -24,7 +24,7 @@ public class ProjectService {
     p.setName(req.name());
     p.setDescription(req.description());
     p.setValue(req.value());
-    p.setStatus(req.status());
+    p.setActive(req.active());
     p.setStartDate(req.startDate());
     p.setEndDate(req.endDate());
     p.setCreatedAt(Instant.now());
@@ -33,8 +33,8 @@ public class ProjectService {
     return toResponse(saved);
   }
 
-  public Page<ProjectResponse> list(Boolean status, String q, Pageable pageable) {
-    return projectRepository.search(status, q, pageable).map(this::toResponse);
+  public Page<ProjectResponse> list(Boolean active, String q, Pageable pageable) {
+    return projectRepository.search(active, q, pageable).map(this::toResponse);
   }
 
   public ProjectResponse getById(Long id) {
@@ -50,7 +50,7 @@ public class ProjectService {
     p.setName(req.name());
     p.setDescription(req.description());
     p.setValue(req.value());
-    p.setStatus(req.status());
+    p.setActive(req.active());
     p.setStartDate(req.startDate());
     p.setEndDate(req.endDate());
     p.setUpdatedAt(Instant.now());
@@ -72,7 +72,7 @@ public class ProjectService {
         p.getName(),
         p.getDescription(),
         p.getValue(),
-        p.getStatus(),
+        p.getActive(),
         p.getStartDate(),
         p.getEndDate(),
         p.getCreatedAt(),
