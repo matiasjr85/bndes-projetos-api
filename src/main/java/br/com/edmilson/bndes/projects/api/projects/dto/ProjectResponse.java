@@ -9,7 +9,7 @@ public record ProjectResponse(
     String name,
     String description,
     BigDecimal value,
-    Boolean status,
+    Boolean active,
     LocalDate startDate,
     LocalDate endDate,
     Instant createdAt,

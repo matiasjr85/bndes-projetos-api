@@ -29,7 +29,7 @@ public class ProjectController {
   @Operation(summary = "List projects with pagination, sorting and filters")
   @GetMapping
   public Page<ProjectResponse> list(
-      @RequestParam(required = false) Boolean status,
+      @RequestParam(required = false) Boolean active,
       @RequestParam(required = false, defaultValue = "") String q,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
@@ -42,7 +42,7 @@ public class ProjectController {
         : Sort.Direction.DESC;
 
     Pageable pageable = PageRequest.of(page, size, Sort.by(dir, field));
-    return projectService.list(status, q, pageable);
+    return projectService.list(active, q, pageable);
   }
 
   // RF04

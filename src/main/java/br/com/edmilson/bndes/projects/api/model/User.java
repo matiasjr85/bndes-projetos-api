@@ -4,9 +4,15 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_users_email", columnNames = "email")
-})
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_users_email", columnNames = "email")
+    },
+    indexes = {
+        @Index(name = "idx_users_email", columnList = "email")
+    }
+)
 public class User {
 
   @Id
@@ -22,8 +28,11 @@ public class User {
   @Column(nullable = false)
   private Boolean enabled = true;
 
-  @Column(name = "created_at", nullable = false)
-  private Instant createdAt = Instant.now();
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
+
+  @Column(name = "updated_at")
+  private Instant updatedAt;
 
   public User() {}
 
@@ -31,7 +40,17 @@ public class User {
     this.email = email;
     this.passwordHash = passwordHash;
     this.enabled = true;
-    this.createdAt = Instant.now();
+  }
+
+  @PrePersist
+  void prePersist() {
+    if (this.createdAt == null) this.createdAt = Instant.now();
+    if (this.enabled == null) this.enabled = true;
+  }
+
+  @PreUpdate
+  void preUpdate() {
+    this.updatedAt = Instant.now();
   }
 
   public Long getId() { return id; }
@@ -48,4 +67,7 @@ public class User {
 
   public Instant getCreatedAt() { return createdAt; }
   public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+
+  public Instant getUpdatedAt() { return updatedAt; }
+  public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 }
