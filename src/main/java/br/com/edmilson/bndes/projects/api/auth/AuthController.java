@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
+  
   private final AuthService authService;
 
   public AuthController(AuthService authService) {
-    this.authService = authService;
+    this.authService = authService;    
   }
 
   @Operation(summary = "Register new user")
@@ -27,12 +27,12 @@ public class AuthController {
 
   @Operation(summary = "Login (returns JWT)")
   @PostMapping("/login")
-  public AuthResponse login(@Valid @RequestBody LoginRequest request) {
+  public AuthResponse login(@Valid @RequestBody LoginRequest request) {    
     return authService.login(request);
   }
 
   @Operation(summary = "Logout (client-side) - just clear the token on frontend")
   @PostMapping("/logout")
   public void logout() {    
-  }
+  }  
 }
