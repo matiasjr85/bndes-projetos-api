@@ -1,15 +1,34 @@
 package br.com.edmilson.bndes.projects.api.projects;
 
-import br.com.edmilson.bndes.projects.api.projects.dto.*;
+import br.com.edmilson.bndes.projects.api.projects.dto.ProjectCreateRequest;
+import br.com.edmilson.bndes.projects.api.projects.dto.ProjectResponse;
+import br.com.edmilson.bndes.projects.api.projects.dto.ProjectUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
+
+  private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+      "id",
+      "name",
+      "description",
+      "value",
+      "active",
+      "startDate",
+      "endDate",
+      "createdAt",
+      "updatedAt"
+  );
 
   private final ProjectService projectService;
 
@@ -35,9 +54,20 @@ public class ProjectController {
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(defaultValue = "id,desc") String sort
   ) {
+    // Normaliza entradas básicas (evita erro bobo)
+    if (page < 0) page = 0;
+    if (size <= 0) size = 10;
+    if (size > 100) size = 100; // limite saudável pra API
+
     String[] sortParts = sort.split(",");
-    String field = sortParts[0];
-    Sort.Direction dir = (sortParts.length > 1 && sortParts[1].equalsIgnoreCase("asc"))
+    String field = sortParts[0].trim();
+
+    // ✅ Whitelist de sort field (evita quebrar ou expor campo indevido)
+    if (!ALLOWED_SORT_FIELDS.contains(field)) {
+      field = "id";
+    }
+
+    Sort.Direction dir = (sortParts.length > 1 && sortParts[1].trim().equalsIgnoreCase("asc"))
         ? Sort.Direction.ASC
         : Sort.Direction.DESC;
 

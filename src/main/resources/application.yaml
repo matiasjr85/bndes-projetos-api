@@ -6,7 +6,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      # ✅ Melhor prática: Flyway é a fonte de verdade.
+      # Use "validate" por padrão e troque via env se precisar.
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+    properties:
+      hibernate:
+        format_sql: true
 
   flyway:
     baseline-on-migrate: true
@@ -18,5 +23,5 @@ app:
 
 logging:
   level:
-    org.springframework.security: DEBUG
-
+    # ✅ Não entregar em DEBUG por padrão
+    org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:INFO}
