@@ -1,287 +1,131 @@
-BNDES Projects API
+📘 BNDES Projetos API
 
-API REST desenvolvida em Java 21 + Spring Boot para gerenciamento de projetos (CRUD) com autenticação JWT, persistência em PostgreSQL e documentação via Swagger/OpenAPI.
+API REST desenvolvida em Java com Spring Boot para autenticação de usuários e gerenciamento de projetos, com foco em boas práticas, segurança e organização.
 
-Projeto desenvolvido como desafio técnico para vaga de estágio.
+🚀 O que este sistema faz
 
-Sumário
+Permite o cadastro e autenticação de usuários
 
-Stack e Tecnologias
+Gerencia projetos institucionais (CRUD completo)
 
-Bibliotecas (dependências)
+Protege endpoints com JWT
 
-Funcionalidades
+Fornece documentação interativa via Swagger
 
-Estrutura de pastas
+Disponibiliza collections de API para testes
 
-Como executar
+🎯 Problema que resolve
 
-Opção 1 — Docker Compose (recomendado)
+Em ambientes institucionais é comum a necessidade de:
 
-Opção 2 — Local (Maven/Java)
+Centralizar informações de projetos
 
-Configuração (variáveis de ambiente)
+Controlar acesso de usuários
 
-Documentação da API (Swagger)
+Garantir segurança, padronização e rastreabilidade
 
-Exemplos de uso (cURL)
+Facilitar integrações futuras
 
-Regras e decisões técnicas
+Esta API resolve esses pontos oferecendo uma base backend segura, documentada e extensível.
 
-Stack e Tecnologias
+💡 Motivação
 
-Java 21
+O projeto foi desenvolvido como desafio técnico para uma vaga de estágio, com o objetivo de demonstrar:
 
-Spring Boot 3.5.x
+Conhecimento em desenvolvimento backend
 
-Spring Web (API REST)
+Organização de código
 
-Spring Security (autenticação e autorização)
+Uso correto de autenticação e segurança
 
-JWT (stateless auth)
+Preocupação com documentação e testes
 
-Spring Data JPA (Hibernate)
+🛠️ Tecnologias
 
-PostgreSQL 16
+Java 17
 
-Flyway (migrations)
+Spring Boot
 
-Bean Validation (Jakarta Validation)
+Spring Security
 
-Swagger/OpenAPI (springdoc)
+JWT
 
-Docker + Docker Compose
+Spring Data JPA
 
-Maven (Maven Wrapper)
+PostgreSQL
 
-Bibliotecas (dependências)
+Flyway
 
-Principais dependências utilizadas (ver pom.xml):
+Swagger / OpenAPI
 
-spring-boot-starter-web
+Docker
 
-spring-boot-starter-security
+Newman (execução de collections de API)
 
-spring-boot-starter-data-jpa
+🧱 Arquitetura
 
-spring-boot-starter-validation
+Arquitetura em camadas:
 
-org.postgresql:postgresql
+Controller → Service → Repository → Database
 
-org.flywaydb:flyway-core + flyway-database-postgresql
 
-io.jsonwebtoken:jjwt-* (API/impl/jackson)
+Com separação clara de responsabilidades e tratamento global de erros.
 
-org.springdoc:springdoc-openapi-starter-webmvc-ui
+🔐 Segurança
 
-Testes:
+Autenticação stateless via JWT
 
-spring-boot-starter-test
+Endpoints públicos:
 
-spring-security-test
+/auth/register
 
-Funcionalidades
-Autenticação
+/auth/login
 
-Cadastro de usuário: POST /auth/register
+/health
 
-Login: POST /auth/login → retorna JWT
+Endpoints protegidos:
 
-Logout: POST /auth/logout → 204 (JWT stateless; logout é client-side)
+/projects/**
 
-Projetos
+📄 Documentação (Swagger)
 
-Criar projeto: POST /projects
+Após executar a aplicação:
 
-Listar projetos com paginação/ordenação/filtro: GET /projects
+http://localhost:8080/swagger-ui/index.html
 
-Buscar por ID: GET /projects/{id}
+🧪 Testes de API
 
-Atualizar projeto: PUT /projects/{id} (update parcial)
+Collections de testes disponíveis em:
 
-Remover projeto: DELETE /projects/{id} (soft delete)
+src/test/resources/api-collections
 
-Extras de qualidade
 
-Ordenação protegida (whitelist) para evitar campos inválidos
+Execução via Newman:
 
-Validação de datas: endDate não pode ser menor que startDate
+newman run src/test/resources/api-collections/projects-api.collection.json \
+  -e src/test/resources/api-collections/local.environment.json
 
-Respostas de erro padronizadas (JSON consistente para 400/404/etc.)
-
-Migrations automáticas via Flyway (src/main/resources/db/migration)
-
-Estrutura de pastas
-src/
- ├─ main/
- │   ├─ java/br/com/edmilson/bndes/projects/api/
- │   │   ├─ auth/
- │   │   │   ├─ dto/
- │   │   │   │   ├─ AuthResponse.java
- │   │   │   │   ├─ LoginRequest.java
- │   │   │   │   └─ RegisterRequest.java
- │   │   │   ├─ AuthController.java
- │   │   │   ├─ AuthService.java
- │   │   │   └─ JwtService.java
- │   │   ├─ config/
- │   │   │   ├─ CorsConfig.java
- │   │   │   ├─ OpenApiConfig.java
- │   │   │   ├─ PasswordConfig.java
- │   │   │   ├─ SecurityConfig.java
- │   │   │   ├─ ApiError.java
- │   │   │   └─ ApiExceptionHandler.java
- │   │   ├─ model/
- │   │   │   ├─ Project.java
- │   │   │   └─ User.java
- │   │   ├─ projects/
- │   │   │   ├─ dto/
- │   │   │   │   ├─ ProjectCreateRequest.java
- │   │   │   │   ├─ ProjectUpdateRequest.java
- │   │   │   │   └─ ProjectResponse.java
- │   │   │   ├─ ProjectController.java
- │   │   │   └─ ProjectService.java
- │   │   ├─ repository/
- │   │   │   ├─ ProjectRepository.java
- │   │   │   └─ UserRepository.java
- │   │   ├─ security/
- │   │   │   ├─ CustomUserDetailsService.java
- │   │   │   └─ JwtAuthFilter.java
- │   │   ├─ BndesProjetosApiApplication.java
- │   │   └─ HealthController.java
- │   └─ resources/
- │       ├─ application.yaml
- │       └─ db/migration/
- │           └─ V1__init.sql
- └─ test/
-     └─ java/... (testes)
-
-Como executar
-Opção 1 — Docker Compose (recomendado)
-
+▶️ Como executar
 Pré-requisitos
 
-Docker e Docker Compose instalados
+Java 17+
 
-Subir API + PostgreSQL
+Docker e Docker Compose
 
-docker compose up -d --build
+Subir banco
+docker-compose up -d
 
-
-Parar containers
-
-docker compose down
-
-
-A API estará disponível em:
-
-http://localhost:8080
-
-Opção 2 — Local (Maven/Java)
-
-Pré-requisitos
-
-Java 21
-
-Maven (ou usar o Maven Wrapper ./mvnw)
-
-PostgreSQL rodando localmente (ou via Docker)
-
-Rodar a aplicação
-
+Rodar aplicação
 ./mvnw spring-boot:run
 
+✅ Considerações finais
 
-Build
+Este projeto vai além de um CRUD simples, priorizando:
 
-./mvnw clean package
+Segurança
 
+Organização
 
-Rodar testes
+Boas práticas
 
-./mvnw test
-
-Configuração (variáveis de ambiente)
-
-A aplicação suporta variáveis de ambiente (com defaults no application.yaml):
-
-Variável	Descrição	Default
-SPRING_DATASOURCE_URL	URL do PostgreSQL	jdbc:postgresql://localhost:5432/bndes_projetos
-SPRING_DATASOURCE_USERNAME	Usuário do banco	postgres
-SPRING_DATASOURCE_PASSWORD	Senha do banco	postgres
-SPRING_JPA_HIBERNATE_DDL_AUTO	Estratégia Hibernate	update (pode usar validate)
-APP_JWT_SECRET	Segredo do JWT	minha-chave-super-secreta-para-jwt-...
-APP_JWT_EXPIRATIONMINUTES	Expiração do JWT	120
-
-No docker-compose.yml essas variáveis já estão configuradas para rodar automaticamente.
-
-Documentação da API (Swagger)
-
-Swagger UI: http://localhost:8080/swagger-ui/index.html
-
-OpenAPI JSON: http://localhost:8080/v3/api-docs
-
-Health: http://localhost:8080/health
-
-Como autenticar no Swagger
-
-Faça POST /auth/register (criar usuário)
-
-Faça POST /auth/login e copie o token
-
-Clique em Authorize (cadeado) no Swagger
-
-Cole:
-
-Bearer SEU_TOKEN_AQUI
-
-Exemplos de uso (cURL)
-1) Registrar usuário
-curl -X POST http://localhost:8080/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@teste.com","password":"123456"}'
-
-2) Login (gera token JWT)
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@teste.com","password":"123456"}'
-
-3) Criar projeto (JWT obrigatório)
-curl -X POST http://localhost:8080/projects \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer SEU_TOKEN" \
-  -d '{
-    "name":"Projeto A",
-    "description":"Projeto para demonstrar CRUD",
-    "value":1000,
-    "startDate":"2025-01-01",
-    "endDate":"2025-12-31"
-  }'
-
-4) Listar projetos (paginação/filtro/sort)
-curl "http://localhost:8080/projects?page=0&size=10&active=true&q=Projeto&sort=id,desc" \
-  -H "Authorization: Bearer SEU_TOKEN"
-
-5) Update parcial (PUT)
-
-Atualiza apenas o que for enviado (campos null não sobrescrevem valores existentes):
-
-curl -X PUT http://localhost:8080/projects/1 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer SEU_TOKEN" \
-  -d '{"description":"Descrição atualizada"}'
-
-6) Delete lógico (soft delete)
-curl -X DELETE http://localhost:8080/projects/1 \
-  -H "Authorization: Bearer SEU_TOKEN"
-
-Regras e decisões técnicas
-
-JWT Stateless: não existe sessão no servidor. O logout é realizado no cliente removendo o token.
-
-Soft delete: ao deletar um projeto, o registro não é removido fisicamente; é marcado com deletedAt e active=false.
-
-Update parcial: o endpoint de update aplica apenas os campos enviados, evitando sobrescrita indevida com null.
-
-Validação de datas: se endDate < startDate, a API retorna 400.
-
-Erros padronizados: respostas de erro retornam um JSON consistente (facilita integração com frontend).
+Clareza para manutenção e evolução futura
