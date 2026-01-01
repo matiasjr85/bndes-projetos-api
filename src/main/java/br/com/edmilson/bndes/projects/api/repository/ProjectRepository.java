@@ -1,32 +1,52 @@
 package br.com.edmilson.bndes.projects.api.repository;
 
 import br.com.edmilson.bndes.projects.api.model.Project;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
-
-import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-  /**
-   * Lista SOMENTE projetos do usuário logado, com filtro opcional por active e busca por texto (name/description).
-   */
-  @Query("""
-      SELECT p
-      FROM Project p
-      WHERE p.deletedAt IS NULL
-        AND LOWER(p.user.email) = LOWER(:email)
-        AND (:active IS NULL OR p.active = :active)
-        AND (
-          :q IS NULL OR :q = '' OR
-          LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
-          LOWER(p.description) LIKE LOWER(CONCAT('%', :q, '%'))
-        )
-      ORDER BY p.createdAt DESC
-      """)
+  // ✅ FTS precisa ser NATIVE QUERY (usa @@, to_tsvector, plainto_tsquery)
+  @Query(
+      value = """
+        SELECT p.*
+        FROM projects p
+        JOIN users u ON u.id = p.user_id
+        WHERE p.deleted_at IS NULL
+          AND LOWER(u.email) = LOWER(:email)
+          AND (:active IS NULL OR p.active = :active)
+          AND (
+            :q IS NULL OR :q = '' OR
+            to_tsvector('portuguese', COALESCE(p.name,'') || ' ' || COALESCE(p.description,'')) @@
+            plainto_tsquery('portuguese', :q)
+          )
+        ORDER BY
+          CASE WHEN :q IS NULL OR :q = '' THEN 0
+              ELSE ts_rank(
+                to_tsvector('portuguese', COALESCE(p.name,'') || ' ' || COALESCE(p.description,'')),
+                plainto_tsquery('portuguese', :q)
+              )
+          END DESC,
+          p.created_at DESC
+      """,
+      countQuery = """
+        SELECT COUNT(*)
+        FROM projects p
+        JOIN users u ON u.id = p.user_id
+        WHERE p.deleted_at IS NULL
+          AND LOWER(u.email) = LOWER(:email)
+          AND (:active IS NULL OR p.active = :active)
+          AND (
+            :q IS NULL OR :q = '' OR
+            to_tsvector('portuguese', COALESCE(p.name,'') || ' ' || COALESCE(p.description,'')) @@
+            plainto_tsquery('portuguese', :q)
+          )
+      """,
+      nativeQuery = true
+  )
   Page<Project> searchByUserEmail(
       @Param("email") String email,
       @Param("active") Boolean active,
@@ -34,9 +54,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       Pageable pageable
   );
 
-  /**
-   * Busca projeto ativo (não deletado) pelo id, garantindo que pertence ao usuário logado.
-   */
+  // ✅ Buscar projeto ativo por ID (soft delete)
+  @Query("""
+      SELECT p
+      FROM Project p
+      WHERE p.id = :id AND p.deletedAt IS NULL
+      """)
+  Optional<Project> findActiveById(@Param("id") Long id);
+
+  // ✅ Buscar projeto ativo por ID + dono (ownership)
   @Query("""
       SELECT p
       FROM Project p
@@ -48,14 +74,4 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       @Param("id") Long id,
       @Param("email") String email
   );
-
-  /**
-   * (Opcional) caso você ainda use em algum lugar sem filtro de usuário.
-   */
-  @Query("""
-      SELECT p
-      FROM Project p
-      WHERE p.id = :id AND p.deletedAt IS NULL
-      """)
-  Optional<Project> findActiveById(@Param("id") Long id);
 }
