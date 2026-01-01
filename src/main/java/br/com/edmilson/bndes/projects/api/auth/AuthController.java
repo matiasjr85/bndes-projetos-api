@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,9 +35,9 @@ public class AuthController {
           content = @Content(schema = @Schema(implementation = ApiError.class)))
   })
   @PostMapping("/register")
-  @ResponseStatus(HttpStatus.CREATED)
-  public void register(@Valid @RequestBody RegisterRequest request) {
+  public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
     authService.register(request);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @Operation(summary = "Login (returns JWT)")
