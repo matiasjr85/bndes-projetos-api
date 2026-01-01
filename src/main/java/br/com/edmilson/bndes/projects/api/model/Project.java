@@ -10,7 +10,8 @@ import java.time.LocalDate;
     name = "projects",
     indexes = {
         @Index(name = "idx_projects_active", columnList = "active"),
-        @Index(name = "idx_projects_deleted_at", columnList = "deleted_at")
+        @Index(name = "idx_projects_deleted_at", columnList = "deleted_at"),
+        @Index(name = "idx_projects_user_id", columnList = "user_id")
     }
 )
 public class Project {
@@ -18,6 +19,11 @@ public class Project {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  // ✅ Dono do projeto
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
   @Column(nullable = false, length = 120)
   private String name;
@@ -68,6 +74,9 @@ public class Project {
 
   public Long getId() { return id; }
   public void setId(Long id) { this.id = id; }
+
+  public User getUser() { return user; }
+  public void setUser(User user) { this.user = user; }
 
   public String getName() { return name; }
   public void setName(String name) { this.name = name; }

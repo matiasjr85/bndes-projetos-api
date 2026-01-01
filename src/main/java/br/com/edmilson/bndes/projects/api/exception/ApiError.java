@@ -1,4 +1,4 @@
-package br.com.edmilson.bndes.projects.api.config;
+package br.com.edmilson.bndes.projects.api.exception;
 
 import java.time.Instant;
 import java.util.Map;

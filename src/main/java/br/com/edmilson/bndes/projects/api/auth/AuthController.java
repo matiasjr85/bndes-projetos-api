@@ -3,7 +3,7 @@ package br.com.edmilson.bndes.projects.api.auth;
 import br.com.edmilson.bndes.projects.api.auth.dto.AuthResponse;
 import br.com.edmilson.bndes.projects.api.auth.dto.LoginRequest;
 import br.com.edmilson.bndes.projects.api.auth.dto.RegisterRequest;
-import br.com.edmilson.bndes.projects.api.config.ApiError;
+import br.com.edmilson.bndes.projects.api.exception.ApiError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

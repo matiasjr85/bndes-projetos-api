@@ -2,6 +2,8 @@ package br.com.edmilson.bndes.projects.api.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -33,6 +35,10 @@ public class User {
 
   @Column(name = "updated_at")
   private Instant updatedAt;
+
+  // ✅ Opcional: relacionamento reverso
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  private List<Project> projects = new ArrayList<>();
 
   public User() {}
 
@@ -70,4 +76,7 @@ public class User {
 
   public Instant getUpdatedAt() { return updatedAt; }
   public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+
+  public List<Project> getProjects() { return projects; }
+  public void setProjects(List<Project> projects) { this.projects = projects; }
 }

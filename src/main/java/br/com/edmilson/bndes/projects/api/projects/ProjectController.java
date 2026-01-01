@@ -1,6 +1,6 @@
 package br.com.edmilson.bndes.projects.api.projects;
 
-import br.com.edmilson.bndes.projects.api.config.ApiError;
+import br.com.edmilson.bndes.projects.api.exception.ApiError;
 import br.com.edmilson.bndes.projects.api.projects.dto.ProjectCreateRequest;
 import br.com.edmilson.bndes.projects.api.projects.dto.ProjectResponse;
 import br.com.edmilson.bndes.projects.api.projects.dto.ProjectUpdateRequest;
