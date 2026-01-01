@@ -1,4 +1,4 @@
-package br.com.edmilson.bndes.projects.api;
+package br.com.edmilson.bndes.projects.api.monitoring;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.GetMapping;
