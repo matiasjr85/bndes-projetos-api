@@ -89,4 +89,54 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       @Param("id") Long id,
       @Param("email") String email
   );
+
+    @Query("""
+      SELECT p
+        FROM Project p
+       WHERE p.deletedAt IS NULL
+         AND (:active IS NULL OR p.active = :active)
+      """)
+  Page<Project> findAllActive(
+      @Param("active") Boolean active,
+      Pageable pageable
+  );
+
+  @Query(
+      value = """
+        SELECT p.*
+          FROM projects p
+         WHERE p.deleted_at IS NULL
+           AND (:active IS NULL OR p.active = :active)
+           AND (
+             :q IS NULL OR :q = '' OR
+             to_tsvector('portuguese', COALESCE(p.name,'') || ' ' || COALESCE(p.description,'')) @@
+             plainto_tsquery('portuguese', :q)
+           )
+         ORDER BY
+           CASE WHEN :q IS NULL OR :q = '' THEN 0
+                ELSE ts_rank(
+                  to_tsvector('portuguese', COALESCE(p.name,'') || ' ' || COALESCE(p.description,'')),
+                  plainto_tsquery('portuguese', :q)
+                )
+           END DESC,
+           p.created_at DESC
+      """,
+      countQuery = """
+        SELECT COUNT(*)
+          FROM projects p
+         WHERE p.deleted_at IS NULL
+           AND (:active IS NULL OR p.active = :active)
+           AND (
+             :q IS NULL OR :q = '' OR
+             to_tsvector('portuguese', COALESCE(p.name,'') || ' ' || COALESCE(p.description,'')) @@
+             plainto_tsquery('portuguese', :q)
+           )
+      """,
+      nativeQuery = true
+  )
+  Page<Project> searchAll(
+      @Param("active") Boolean active,
+      @Param("q") String q,
+      Pageable pageable
+  );
 }

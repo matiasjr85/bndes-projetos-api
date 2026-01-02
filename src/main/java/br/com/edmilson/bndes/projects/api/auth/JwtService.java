@@ -10,8 +10,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class JwtService {
@@ -31,13 +30,43 @@ public class JwtService {
     Instant now = Instant.now();
     Instant exp = now.plus(expirationMinutes, ChronoUnit.MINUTES);
 
+    Map<String, Object> claims = new HashMap<>();
+    if (extraClaims != null) claims.putAll(extraClaims);
+
+    // ✅ JTI para blacklist
+    claims.putIfAbsent("jti", UUID.randomUUID().toString().replace("-", ""));
+
     return Jwts.builder()
         .subject(subject)
-        .claims(extraClaims)
+        .claims(claims)
         .issuedAt(Date.from(now))
         .expiration(Date.from(exp))
         .signWith(secretKey)
         .compact();
+  }
+
+  public Claims parseAllClaims(String token) {
+    return Jwts.parser()
+        .verifyWith(secretKey)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+  }
+
+  public String extractSubject(String token) {
+    return parseAllClaims(token).getSubject();
+  }
+
+  public String extractJti(String token) {
+    Claims claims = parseAllClaims(token);
+    Object jti = claims.get("jti");
+    return jti == null ? null : String.valueOf(jti);
+  }
+
+  public Instant extractExpirationInstant(String token) {
+    Claims claims = parseAllClaims(token);
+    Date exp = claims.getExpiration();
+    return (exp == null) ? null : exp.toInstant();
   }
 
   public boolean isTokenValid(String token) {
@@ -49,19 +78,7 @@ public class JwtService {
     }
   }
 
-  public String extractSubject(String token) {
-    return parseAllClaims(token).getSubject();
-  }
-
   public long getExpiresInSeconds() {
     return expirationMinutes * 60;
-  }
-
-  private Claims parseAllClaims(String token) {
-    return Jwts.parser()
-        .verifyWith(secretKey)
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
   }
 }

@@ -10,12 +10,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+@EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
 
@@ -50,7 +52,11 @@ public class SecurityConfig {
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/health").permitAll()
-        .requestMatchers("/auth/**").permitAll()
+
+        // ✅ Auth público (exceto logout)
+        .requestMatchers("/auth/login", "/auth/register", "/auth/refresh").permitAll()
+        .requestMatchers("/auth/logout").authenticated()
+
         .anyRequest().authenticated()
       )
       .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -74,7 +80,6 @@ public class SecurityConfig {
 
       objectMapper.writeValue(res.getOutputStream(), body);
     } catch (Exception ignored) {
-      // fallback extremo: se falhar serialização, ao menos garante o status
       res.setStatus(status.value());
     }
   }

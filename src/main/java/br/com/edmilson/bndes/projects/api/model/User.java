@@ -27,6 +27,10 @@ public class User {
   @Column(name = "password_hash", nullable = false, length = 255)
   private String passwordHash;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private Role role = Role.USER;
+
   @Column(nullable = false)
   private Boolean enabled = true;
 
@@ -36,7 +40,6 @@ public class User {
   @Column(name = "updated_at")
   private Instant updatedAt;
 
-  // ✅ Opcional: relacionamento reverso
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Project> projects = new ArrayList<>();
 
@@ -46,12 +49,17 @@ public class User {
     this.email = email;
     this.passwordHash = passwordHash;
     this.enabled = true;
+    this.role = Role.USER;
   }
 
   @PrePersist
   void prePersist() {
     if (this.createdAt == null) this.createdAt = Instant.now();
     if (this.enabled == null) this.enabled = true;
+    if (this.role == null) this.role = Role.USER;
+
+    // opcional (se quiser updatedAt já no create):
+    // if (this.updatedAt == null) this.updatedAt = this.createdAt;
   }
 
   @PreUpdate
@@ -67,6 +75,9 @@ public class User {
 
   public String getPasswordHash() { return passwordHash; }
   public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+  public Role getRole() { return role; }
+  public void setRole(Role role) { this.role = role; }
 
   public Boolean getEnabled() { return enabled; }
   public void setEnabled(Boolean enabled) { this.enabled = enabled; }

@@ -25,7 +25,8 @@ springdoc:
 app:
   jwt:
     secret: ${APP_JWT_SECRET:minha-chave-super-secreta-para-jwt-1234567890}
-    expirationMinutes: ${APP_JWT_EXPIRATIONMINUTES:1}
+    expirationMinutes: ${APP_JWT_EXPIRATIONMINUTES:15}
+    refreshExpirationDays: ${APP_JWT_REFRESH_EXPIRATION_DAYS:7}
 
 logging:
   level:

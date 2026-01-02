@@ -51,22 +51,28 @@ public class ProjectService {
    * - Com busca (q preenchido): FTS native (remove sort para evitar ORDER BY ambíguo)
    */
   public Page<ProjectResponse> list(Boolean active, String q, Pageable pageable) {
-    String email = getCurrentUser().getEmail();
-
+    User currentUser = getCurrentUser();
     boolean hasQuery = (q != null && !q.isBlank());
 
-    // ✅ q vazio -> lista normal (sort funciona: id,desc etc.)
+    boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
+
     if (!hasQuery) {
-      return projectRepository.findAllByUserEmail(email, active, pageable)
+      if (isAdmin) {
+        return projectRepository.findAllActive(active, pageable).map(this::toResponse);
+      }
+      return projectRepository.findAllByUserEmail(currentUser.getEmail(), active, pageable)
           .map(this::toResponse);
     }
 
-    // ✅ q preenchido -> FTS (não passa sort para a native query)
     Pageable noSort = pageable.isUnpaged()
         ? Pageable.unpaged()
         : PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
 
-    return projectRepository.searchByUserEmail(email, active, q.trim(), noSort)
+    if (isAdmin) {
+      return projectRepository.searchAll(active, q.trim(), noSort).map(this::toResponse);
+    }
+
+    return projectRepository.searchByUserEmail(currentUser.getEmail(), active, q.trim(), noSort)
         .map(this::toResponse);
   }
 
@@ -102,10 +108,17 @@ public class ProjectService {
    * - Se não existir (ou deletado): 404
    */
   private Project getOwnedOrThrow(Long id, String email) {
+    User currentUser = getCurrentUser();
+    boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");
+
+    if (isAdmin) {
+      return projectRepository.findActiveById(id)
+          .orElseThrow(() -> new ResourceNotFoundException(ApiMessages.PROJECT_NOT_FOUND));
+    }
+
     Optional<Project> owned = projectRepository.findActiveByIdAndUserEmail(id, email);
     if (owned.isPresent()) return owned.get();
 
-    // Não achou como "owned": decide entre 403 e 404
     Optional<Project> exists = projectRepository.findActiveById(id);
     if (exists.isEmpty()) {
       throw new ResourceNotFoundException(ApiMessages.PROJECT_NOT_FOUND);

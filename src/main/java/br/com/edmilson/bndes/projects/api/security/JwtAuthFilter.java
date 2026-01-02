@@ -3,7 +3,9 @@ package br.com.edmilson.bndes.projects.api.security;
 import br.com.edmilson.bndes.projects.api.auth.JwtService;
 import br.com.edmilson.bndes.projects.api.exception.ApiError;
 import br.com.edmilson.bndes.projects.api.messages.ApiMessages;
+import br.com.edmilson.bndes.projects.api.repository.RevokedTokenRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -27,15 +29,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
   private final CustomUserDetailsService userDetailsService;
+  private final RevokedTokenRepository revokedTokenRepository;
   private final ObjectMapper objectMapper;
 
   public JwtAuthFilter(
       JwtService jwtService,
       CustomUserDetailsService userDetailsService,
+      RevokedTokenRepository revokedTokenRepository,
       ObjectMapper objectMapper
   ) {
     this.jwtService = jwtService;
     this.userDetailsService = userDetailsService;
+    this.revokedTokenRepository = revokedTokenRepository;
     this.objectMapper = objectMapper;
   }
 
@@ -44,7 +49,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     String path = request.getServletPath();
     if (path == null) return false;
 
-    return path.startsWith("/auth/")
+    // ✅ logout PRECISA passar pelo filtro para autenticar e revogar
+    if (path.equals("/auth/logout")) return false;
+
+    return path.equals("/auth/login")
+        || path.equals("/auth/register")
+        || path.equals("/auth/refresh")
         || path.equals("/health")
         || path.startsWith("/swagger-ui")
         || path.startsWith("/v3/api-docs")
@@ -60,7 +70,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     String authHeader = request.getHeader("Authorization");
 
-    // Sem Bearer -> deixa seguir (SecurityConfig decide se é público/privado)
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       filterChain.doFilter(request, response);
       return;
@@ -68,28 +77,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     String token = authHeader.substring(7).trim();
 
-    // Se já tem auth no contexto, segue
     if (SecurityContextHolder.getContext().getAuthentication() != null) {
       filterChain.doFilter(request, response);
       return;
     }
 
     try {
-      // Vai lançar ExpiredJwtException se expirado
-      String email = jwtService.extractSubject(token);
+      Claims claims = jwtService.parseAllClaims(token);
 
+      String email = claims.getSubject();
       if (email == null || email.isBlank()) {
         writeUnauthorized(response, request, ApiMessages.INVALID_TOKEN, "invalid_token");
         return;
       }
 
-      UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-      // Validação extra (assinatura/malformado etc)
-      if (!jwtService.isTokenValid(token)) {
-        writeUnauthorized(response, request, ApiMessages.INVALID_TOKEN, "invalid_token");
+      String jti = claims.get("jti", String.class);
+      if (jti != null && revokedTokenRepository.existsByJti(jti)) {
+        writeUnauthorized(response, request, ApiMessages.TOKEN_REVOKED, "token_revoked");
         return;
       }
+
+      UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
       UsernamePasswordAuthenticationToken authToken =
           new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
