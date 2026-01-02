@@ -18,4 +18,7 @@ public final class ApiMessages {
   public static final String PROJECT_ACCESS_FORBIDDEN = "You do not have permission to access this project.";
   
   public static final String RESOURCE_ALREADY_EXISTS = "Resource already exists.";
+  public static final String TOKEN_EXPIRED = "Token expired.";
+  public static final String INVALID_TOKEN = "Invalid token.";
+
 }

@@ -14,6 +14,7 @@ import br.com.edmilson.bndes.projects.api.repository.ProjectRepository;
 import br.com.edmilson.bndes.projects.api.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -46,10 +47,27 @@ public class ProjectService {
 
   /**
    * ✅ Lista SOMENTE projetos do usuário logado
+   * - Sem busca (q vazio): JPQL (respeita sort do pageable)
+   * - Com busca (q preenchido): FTS native (remove sort para evitar ORDER BY ambíguo)
    */
   public Page<ProjectResponse> list(Boolean active, String q, Pageable pageable) {
     String email = getCurrentUser().getEmail();
-    return projectRepository.searchByUserEmail(email, active, q, pageable).map(this::toResponse);
+
+    boolean hasQuery = (q != null && !q.isBlank());
+
+    // ✅ q vazio -> lista normal (sort funciona: id,desc etc.)
+    if (!hasQuery) {
+      return projectRepository.findAllByUserEmail(email, active, pageable)
+          .map(this::toResponse);
+    }
+
+    // ✅ q preenchido -> FTS (não passa sort para a native query)
+    Pageable noSort = pageable.isUnpaged()
+        ? Pageable.unpaged()
+        : PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+
+    return projectRepository.searchByUserEmail(email, active, q.trim(), noSort)
+        .map(this::toResponse);
   }
 
   public ProjectResponse getById(Long id) {

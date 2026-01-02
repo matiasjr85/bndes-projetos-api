@@ -5,6 +5,8 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
 
   jpa:
+    # ✅ API: melhor prática é desabilitar Open Session in View
+    open-in-view: false
     hibernate:
       # ✅ Melhor prática: Flyway é a fonte de verdade.
       # Use "validate" por padrão e troque via env se precisar.
@@ -23,8 +25,8 @@ springdoc:
 app:
   jwt:
     secret: ${APP_JWT_SECRET:minha-chave-super-secreta-para-jwt-1234567890}
-    expirationMinutes: ${APP_JWT_EXPIRATIONMINUTES:120}
+    expirationMinutes: ${APP_JWT_EXPIRATIONMINUTES:1}
 
 logging:
-  level:    
+  level:
     org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:INFO}

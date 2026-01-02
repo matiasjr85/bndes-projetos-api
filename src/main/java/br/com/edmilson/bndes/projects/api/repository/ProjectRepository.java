@@ -9,7 +9,22 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-  // ✅ FTS precisa ser NATIVE QUERY (usa @@, to_tsvector, plainto_tsquery)
+  // ✅ LISTAGEM NORMAL (SEM FTS) — respeita sort do Pageable (id,desc etc.)
+  @Query("""
+      SELECT p
+      FROM Project p
+      WHERE p.deletedAt IS NULL
+        AND LOWER(p.user.email) = LOWER(:email)
+        AND (:active IS NULL OR p.active = :active)
+      """)
+  Page<Project> findAllByUserEmail(
+      @Param("email") String email,
+      @Param("active") Boolean active,
+      Pageable pageable
+  );
+
+  // ✅ FTS (NATIVE) — usa ranking + created_at (ordem própria)
+  // ⚠️ Recomendo NÃO passar sort do pageable quando usar esse método (ver ajuste no service)
   @Query(
       value = """
         SELECT p.*
