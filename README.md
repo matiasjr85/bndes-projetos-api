@@ -112,11 +112,8 @@ Java 17+
 
 Docker e Docker Compose
 
-Subir banco
-docker-compose up -d
-
-Rodar aplicação
-./mvnw spring-boot:run
+Subir banco e a API
+docker-compose up --build
 
 ✅ Considerações finais
 
