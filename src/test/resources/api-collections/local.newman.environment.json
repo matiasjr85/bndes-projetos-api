@@ -1,0 +1,20 @@
+{
+  "id": "bndes-local-newman-env",
+  "name": "Local (Newman)",
+  "values": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "enabled": true },
+    { "key": "password", "value": "Test@1234", "enabled": true },
+
+    { "key": "email_user1", "value": "", "enabled": true },
+    { "key": "email_user2", "value": "", "enabled": true },
+
+    { "key": "token_user1", "value": "", "enabled": true },
+    { "key": "token_user2", "value": "", "enabled": true },
+    { "key": "refresh_user1", "value": "", "enabled": true },
+
+    { "key": "projectId_user1", "value": "", "enabled": true }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-01-04T00:00:00.000Z",
+  "_postman_exported_using": "Postman/Newman"
+}
