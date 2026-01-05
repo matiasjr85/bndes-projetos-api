@@ -175,8 +175,7 @@ public class AuthService {
     return user;
   }
 
-  private User getCurrentUserFromRequest(HttpServletRequest request) {
-    // SecurityContext já vai estar populado pelo JwtAuthFilter
+  private User getCurrentUserFromRequest(HttpServletRequest request) {    
     String email = (request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : null;
     if (email == null || email.isBlank()) {
       throw new UnauthorizedException(ApiMessages.UNAUTHORIZED);

@@ -56,10 +56,7 @@ public class User {
   void prePersist() {
     if (this.createdAt == null) this.createdAt = Instant.now();
     if (this.enabled == null) this.enabled = true;
-    if (this.role == null) this.role = Role.USER;
-
-    // opcional (se quiser updatedAt já no create):
-    // if (this.updatedAt == null) this.updatedAt = this.createdAt;
+    if (this.role == null) this.role = Role.USER;   
   }
 
   @PreUpdate

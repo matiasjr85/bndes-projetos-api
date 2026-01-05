@@ -48,8 +48,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getServletPath();
     if (path == null) return false;
-
-    // ✅ logout PRECISA passar pelo filtro para autenticar e revogar
+    
     if (path.equals("/auth/logout")) return false;
 
     return path.equals("/auth/login")

@@ -44,12 +44,7 @@ public class ProjectService {
     Project saved = projectRepository.save(p);
     return toResponse(saved);
   }
-
-  /**
-   * ✅ Lista SOMENTE projetos do usuário logado
-   * - Sem busca (q vazio): JPQL (respeita sort do pageable)
-   * - Com busca (q preenchido): FTS native (remove sort para evitar ORDER BY ambíguo)
-   */
+  
   public Page<ProjectResponse> list(Boolean active, String q, Pageable pageable) {
     User currentUser = getCurrentUser();
     boolean hasQuery = (q != null && !q.isBlank());
@@ -100,13 +95,7 @@ public class ProjectService {
     p.softDelete();
     projectRepository.save(p);
   }
-
-  /**
-   * ✅ Busca o projeto do usuário logado.
-   * - Se existir e for do usuário: retorna
-   * - Se existir, mas for de outro usuário: 403
-   * - Se não existir (ou deletado): 404
-   */
+  
   private Project getOwnedOrThrow(Long id, String email) {
     User currentUser = getCurrentUser();
     boolean isAdmin = currentUser.getRole() != null && currentUser.getRole().name().equals("ADMIN");

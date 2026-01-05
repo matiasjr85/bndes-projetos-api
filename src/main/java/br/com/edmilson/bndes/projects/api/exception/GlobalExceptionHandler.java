@@ -40,9 +40,7 @@ public class GlobalExceptionHandler {
       HttpMessageNotReadableException ex,
       HttpServletRequest request
   ) {
-    // Causa mais específica costuma ser algo como:
-    // "Cannot deserialize value of type ... from String ..."
-    // Mantemos curto pra não vazar detalhes demais.
+   
     String cause = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : null;
     if (cause != null && cause.length() > 200) {
       cause = cause.substring(0, 200) + "...";

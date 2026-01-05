@@ -121,19 +121,15 @@ class ProjectServiceTest {
 
     when(userRepository.findByEmailIgnoreCase("user2@test.com"))
         .thenReturn(Optional.of(user2));
-
-    // projeto existe, mas não pertence ao user2
+    
     Project p = new Project();
     User owner = new User();
     owner.setEmail("user1@test.com");
     p.setUser(owner);
-
-    // como sua API retorna 403 (e não 404), o service provavelmente valida existência e depois bloqueia
+    
     when(projectRepository.findActiveByIdAndUserEmail(eq(1L), eq("user2@test.com")))
         .thenReturn(Optional.empty());
-
-    // este stub pode ou não ser chamado dependendo da sua implementação;
-    // deixamos lenient para não quebrar se o service não precisar consultar por id.
+    
     lenient().when(projectRepository.findActiveById(1L))
         .thenReturn(Optional.of(p));
 

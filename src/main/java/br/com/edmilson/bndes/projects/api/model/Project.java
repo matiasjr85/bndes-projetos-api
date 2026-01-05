@@ -19,8 +19,7 @@ public class Project {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  // ✅ Dono do projeto
+  
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
@@ -35,7 +34,7 @@ public class Project {
   private BigDecimal value;
 
   @Column(nullable = false)
-  private Boolean active = true; // true=ativo, false=inativo
+  private Boolean active = true; 
 
   @Column(name = "start_date")
   private LocalDate startDate;

@@ -4,12 +4,9 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
 
-  jpa:
-    # ✅ API: melhor prática é desabilitar Open Session in View
+  jpa:    
     open-in-view: false
-    hibernate:
-      # ✅ Melhor prática: Flyway é a fonte de verdade.
-      # Use "validate" por padrão e troque via env se precisar.
+    hibernate:      
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     properties:
       hibernate:

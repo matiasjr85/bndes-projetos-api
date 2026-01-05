@@ -32,8 +32,7 @@ public class JwtService {
 
     Map<String, Object> claims = new HashMap<>();
     if (extraClaims != null) claims.putAll(extraClaims);
-
-    // ✅ JTI para blacklist
+    
     claims.putIfAbsent("jti", UUID.randomUUID().toString().replace("-", ""));
 
     return Jwts.builder()

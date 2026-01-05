@@ -63,11 +63,7 @@ class AuthServiceTest {
 
     User saved = captor.getValue();
     assertThat(saved.getEmail()).isEqualTo("user@test.com");
-    assertThat(saved.getRole()).isEqualTo(Role.USER);
-
-    // Não stubba nem verifica encode aqui (evita UnnecessaryStubbingException)
-    // Se você quiser, pode garantir que nenhum método do encoder foi chamado:
-    // verifyNoInteractions(passwordEncoder);
+    assertThat(saved.getRole()).isEqualTo(Role.USER);    
   }
 
   @Test
@@ -82,12 +78,8 @@ class AuthServiceTest {
         .thenReturn(Optional.of(existing));
 
     service.register(req);
-
-    // comportamento atual: o service chama save mesmo existindo (idempotente / re-save)
+    
     verify(userRepository).save(any(User.class));
-
-    // Não stubba nem verifica encode aqui (evita UnnecessaryStubbingException)
-    // verifyNoInteractions(passwordEncoder);
   }
 
   @Test

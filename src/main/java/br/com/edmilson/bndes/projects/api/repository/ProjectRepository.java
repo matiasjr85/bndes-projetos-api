@@ -21,10 +21,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       @Param("email") String email,
       @Param("active") Boolean active,
       Pageable pageable
-  );
-
-  // ✅ FTS (NATIVE) — usa ranking + created_at (ordem própria)
-  // ⚠️ Recomendo NÃO passar sort do pageable quando usar esse método (ver ajuste no service)
+  );  
+  
   @Query(
       value = """
         SELECT p.*
@@ -68,16 +66,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
       @Param("q") String q,
       Pageable pageable
   );
-
-  // ✅ Buscar projeto ativo por ID (soft delete)
+  
   @Query("""
       SELECT p
       FROM Project p
       WHERE p.id = :id AND p.deletedAt IS NULL
       """)
   Optional<Project> findActiveById(@Param("id") Long id);
-
-  // ✅ Buscar projeto ativo por ID + dono (ownership)
+  
   @Query("""
       SELECT p
       FROM Project p
